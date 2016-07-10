@@ -1,0 +1,31 @@
+{
+  "name": "request-cached-promise",
+  "version": "0.0.2",
+  "description": "promisified http request with caching",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
+  "author": "Konstantin Pogorelov <or@pluseq.com>",
+  "license": "WTFPL",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/disjunction/node-request-cached-promise.git"
+  },
+  "keywords": [
+    "cache",
+    "promise",
+    "request",
+    "http",
+    "cache manager"
+  ],
+  "dependencies": {
+    "request-promise": "^2.0.1"
+  },
+  "devDependencies": {
+    "cache-manager": "^1.4.0",
+    "eslint": "^3.0.1",
+    "jasme": "^4.1.2",
+    "nock": "^7.2.2"
+  }
+}

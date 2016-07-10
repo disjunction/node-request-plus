@@ -1,0 +1,11 @@
+# just a handy way to try out different node versions
+
+cmm:
+    image: node:6
+    tty: true
+    stdin_open: true
+    volumes:
+        - ./src:/app/src
+        - ./test:/app/test
+        - ./package.json:/app/package.json
+    command: sleep 1000000
