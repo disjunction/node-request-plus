@@ -5,20 +5,21 @@ function me(requester, opts) {
   opts.delay = opts.delay || 3000; // use 3 sec. delay between retries
   opts.transformDelay = opts.transformDelay || (attempt => opts.delay);
 
-  const emitter = requester.emitter || {emit: () => {}};
+  const emitter = requester.plus.emitter || {emit: () => {}};
   const emit = emitter.emit.bind(emitter);
 
   function rpWithRetry(uri, requestOptions, callback, attempt) {
     attempt = attempt || 1;
-    emit('attempt', uri, requestOptions, callback, attempt);
+    emit('retry', uri, requestOptions, callback, attempt);
     return requester(uri, requestOptions, callback)
     .then(response => {
       if (attempt > 1) {
-        emit('attemptSucessful', uri, requestOptions, callback, attempt);
+        emit('retryResponse', uri, requestOptions, callback, attempt);
       }
       return response;
     })
     .catch(error => {
+      emit('retryError', error, uri, requestOptions, callback, attempt);
       if (opts.errorFilter(error, uri, requestOptions)) {
         if (attempt <= opts.attempts - 1) {
           return (new Promise(resolve => setTimeout(resolve, opts.transformDelay(attempt))))

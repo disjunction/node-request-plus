@@ -6,7 +6,7 @@ const rp = require('request-promise');
 const nock = require('nock');
 const cm = require('cache-manager');
 
-describe('cacheWrapper', () => {
+describe('cacheDecorator', () => {
   let cache;
 
   beforeEach(() => {

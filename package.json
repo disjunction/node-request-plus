@@ -4,7 +4,7 @@
   "description": "promisified http request with caching",
   "main": "src/index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/jasme/run.js test/indexSpec.js test/*DecoratorSpec.js"
   },
   "author": "Konstantin Pogorelov <or@pluseq.com>",
   "license": "WTFPL",

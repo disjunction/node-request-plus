@@ -3,7 +3,7 @@
 default: test
 
 test:
-	./node_modules/jasme/run.js
+	./node_modules/jasme/run.js test/*Spec.js
 lint:
 	./node_modules/eslint/bin/eslint.js .
 

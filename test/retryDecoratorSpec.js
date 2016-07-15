@@ -2,11 +2,11 @@
 'use strict';
 
 const retryWrapper = require('../src/retryDecorator');
-const rp = require('request-promise');
+const rp = require('../src/index');
 const nock = require('nock');
 const expect = require('chai').expect;
 
-describe('retryWrapper', () => {
+describe('retryDecorator', () => {
   it('retries on 503 error', done => {
     nock('http://example1.com')
       .get('/test-path')
@@ -20,9 +20,10 @@ describe('retryWrapper', () => {
       .get('/test-path')
       .reply(200, 'hello foo');
 
-    const request = retryWrapper(rp, {
+    const request = rp().plus.wrap(retryWrapper, {
       delay: 100
     });
+
     request('http://example1.com/test-path')
       .then(body => {
         expect(body).to.equal('hello foo');
@@ -44,7 +45,7 @@ describe('retryWrapper', () => {
       .get('/test-path')
       .reply(200, 'hello foo');
 
-    const request = retryWrapper(rp, {
+    const request = rp().plus.wrap(retryWrapper, {
       delay: 100,
       attempts: 2
     });
@@ -64,7 +65,7 @@ describe('retryWrapper', () => {
       .get('/test-path')
       .reply(200, 'hello foo');
 
-    const request = retryWrapper(rp, {
+    const request = rp().plus.wrap(retryWrapper, {
       delay: 100
     });
     request('http://example.com/test-path')

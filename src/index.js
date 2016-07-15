@@ -1,28 +1,41 @@
-const EventEmitter = require('events');
+const requestPromise = require('request-promise');
 
-const cacheDecorator = require('./cacheDecorator');
-const retryDecorator = require('./retryDecorator');
+const wrappers = {
+  event: require('./eventDecorator'),
+  retry: require('./retryDecorator'),
+  cache: require('./cacheDecorator'),
+};
 
-module.exports = function(requester) {
-  const emitter = new EventEmitter();
-  const emit = emitter.emit.bind(emitter);
-
-  function me(uri, requestOptions, callback) {
-    emit('request', uri, requestOptions, callback);
-    return requester(uri, requestOptions, callback)
-    .then(body => {
-      emit('response', body, uri, requestOptions, callback);
-      return body;
-    })
-    .catch(error => {
-      emit('error', error, uri, requestOptions, callback);
-      throw error;
-    });
+function me(factoryOpts) {
+  function replaced(uri, requestOptions, callback) {
+    return requestPromise(uri, requestOptions, callback);
   }
 
-  me.emitter = emitter;
-  me.retry = opts => requester = retryDecorator(requester, opts);
-  me.cache = opts => requester = cacheDecorator(requester, opts);
+  const wrap = ((decorator, opts) => {
+    const newReplaced = decorator(replaced, opts);
+    newReplaced.plus = Object.assign({}, replaced.plus, {wrap: wrap});
+    replaced = newReplaced;
+    return replaced;
+  });
 
-  return me;
+  replaced.plus = {
+    wrap: wrap
+  };
+
+  if (factoryOpts) {
+    for (let wrapperName of ['event', 'retry', 'cache']) {
+      if (factoryOpts[wrapperName]) {
+        replaced = replaced.plus.wrap(wrappers[wrapperName], factoryOpts[wrapperName]);
+      }
+    }
+    return replaced;
+  }
+
+  return replaced;
 };
+
+me.registerWrapper = function(wrapperName, wrapper) {
+  wrappers[wrapperName] = wrapper;
+};
+
+module.exports = me;
