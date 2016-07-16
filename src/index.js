@@ -1,5 +1,5 @@
+'use strict';
 const requestPromise = require('request-promise-native');
-
 const wrappers = {
   event: require('./eventDecorator'),
   retry: require('./retryDecorator'),

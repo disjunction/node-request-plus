@@ -1,3 +1,5 @@
+'use strict';
+
 /**
 * @param {Function} requester
 * @param {Object} [opts]
@@ -7,7 +9,7 @@
 * @return {function(uri, requestOptions, callback): Promise}
 */
 function me(requester, opts) {
-  opts = opts || {};
+  opts = typeof opts === 'object' ? opts : {};
   opts.attempts = opts.attempts !== undefined ? opts.attempts : 3;
   opts.errorFilter = opts.errorFilter || me.defaultErrorFilter;
   opts.transformDelay = opts.transformDelay || (attempt => opts.delay); // eslint-disable-line

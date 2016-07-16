@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @param {Function} requester
  * @param {Object} opts
