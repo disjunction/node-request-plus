@@ -57,4 +57,34 @@ describe('multiple wraps', () => {
     rp('http://index-muliple1.com/test-path')
       .catch(done.fail);
   });
+
+  it('retry emits multiple retryRequest and one retryResponse', done => {
+    for (let i = 0; i++ < 9;) {
+      nock('http://index-muliple2.com')
+        .get('/test-path')
+        .reply(500, 'error');
+    }
+
+    nock('http://index-muliple2.com')
+      .get('/test-path')
+      .reply(200, 'success');
+
+    const request = rpPlus()
+      .plus.wrap(eventDecorator)
+      .plus.wrap(retryDecorator, {
+        delay: 20,
+        attempts: 10
+      });
+
+    let counter = 0;
+    request.plus.emitter.on('retryRequest', () => counter++);
+    request.plus.emitter.on('retryResponse', () => {
+      expect(counter).toBe(10);
+      done();
+    });
+
+    request('http://index-muliple2.com/test-path')
+      .catch(done.fail);
+  });
+
 });

@@ -1,7 +1,12 @@
 const EventEmitter = require('events');
 
-module.exports = function(requester) {
-  const emitter = new EventEmitter();
+/**
+ * @param {Function} requester
+ * @param {Object} [opts]
+ * @param {EventEmitter} [opts.emitter]
+ */
+module.exports = function(requester, opts) {
+  const emitter = (opts && opts.emitter) || new EventEmitter();
   const emit = emitter.emit.bind(emitter);
 
   function me(uri, requestOptions, callback) {

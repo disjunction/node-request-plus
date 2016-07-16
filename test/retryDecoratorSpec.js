@@ -4,7 +4,6 @@
 const retryWrapper = require('../src/retryDecorator');
 const rp = require('../src/index');
 const nock = require('nock');
-const expect = require('chai').expect;
 
 describe('retryDecorator', () => {
   it('retries on 503 error', done => {
@@ -26,7 +25,7 @@ describe('retryDecorator', () => {
 
     request('http://example1.com/test-path')
       .then(body => {
-        expect(body).to.equal('hello foo');
+        expect(body).toEqual('hello foo');
         done();
       })
       .catch(done.fail);
@@ -73,6 +72,28 @@ describe('retryDecorator', () => {
         done.fail('unexpected success');
       })
       .catch(done);
+  });
+
+  it('uses delay and errorFilter closuers', done => {
+    nock('http://example4.com')
+      .get('/test-path')
+      .reply(403, 'not found');
+
+    nock('http://example4.com')
+      .get('/test-path')
+      .reply(200, 'hello foo');
+
+    const request = rp().plus.wrap(retryWrapper, {
+      delay: function(attempt) {
+        return attempt * 10 + 10;
+      },
+      errorFilter(error) {
+        return error.statusCode >= 400;
+      }
+    });
+    request('http://example4.com/test-path')
+      .then(done)
+      .catch(done.fail);
   });
 });
 

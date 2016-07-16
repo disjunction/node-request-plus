@@ -1,9 +1,10 @@
-const requestPromise = require('request-promise');
+const requestPromise = require('request-promise-native');
 
 const wrappers = {
   event: require('./eventDecorator'),
   retry: require('./retryDecorator'),
   cache: require('./cacheDecorator'),
+  prom: require('./promDecorator'),
 };
 
 function me(factoryOpts) {
@@ -12,6 +13,12 @@ function me(factoryOpts) {
   }
 
   const wrap = ((decorator, opts) => {
+    if (typeof decorator === 'string') {
+      if (!wrappers[decorator]) {
+        throw new Error('unknown request-plus wrapper: ' + decorator);
+      }
+      decorator = wrappers[decorator];
+    }
     const newReplaced = decorator(replaced, opts);
     newReplaced.plus = Object.assign({}, replaced.plus, {wrap: wrap});
     replaced = newReplaced;

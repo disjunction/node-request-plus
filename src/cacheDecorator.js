@@ -3,7 +3,7 @@
 const myName = 'cacheDecorator';
 
 // http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method
-const defaultHash = function (str, requester) {
+const defaultHash = function (str, requester) { // eslint-disable-line
   let hash = 0, char;
   if (!str.length) {
     return hash;
@@ -28,6 +28,7 @@ const defaultGetKey = function(requestParam, hash, requester) {
 };
 
 /**
+* @param {Function} requester
 * @param {Object} opts
 * @param {Object} opts.cache - cache manager cache
 * @param {Object} [opts.cacheOptions] - otions for the cache
@@ -36,6 +37,10 @@ const defaultGetKey = function(requestParam, hash, requester) {
 * @return {function(uri, requestOptions, callback): Promise}
 */
 module.exports = function(requester, opts) {
+  const emit = requester.plus && requester.plus.emitter
+    ? requester.plus.emitter.emit.bind(requester.plus.emitter)
+    : () => {};
+
   if (typeof opts !== 'object' || !opts.cache) {
     throw new Error(myName + ' expects {cache: <Cache>} as opts');
   }
@@ -44,12 +49,14 @@ module.exports = function(requester, opts) {
 
   return function(uri, requestOptions, callback) {
     let key = getKey(uri, hash, requester);
-
+    emit('cacheRequest', uri, requestOptions);
     return opts.cache.wrap(
       key,
-      () => requester(uri, requestOptions, callback),
-      opts.cacheOptions || {},
-      callback
+      () => {
+        emit('cacheMiss', uri, requestOptions);
+        return requester(uri, requestOptions, callback);
+      },
+      opts.cacheOptions || {}
     );
   };
 };
