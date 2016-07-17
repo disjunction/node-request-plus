@@ -23,6 +23,7 @@
   ],
   "devDependencies": {
     "cache-manager": "^1.4.0",
+    "coveralls": "^2.11.11",
     "eslint": "^3.0.1",
     "istanbul": "^0.4.4",
     "jasme": "^4.1.2",
