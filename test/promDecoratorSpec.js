@@ -83,15 +83,15 @@ describe('promDecorator', () => {
 
      nock('http://example.com')
       .get('/prom-decorator')
-      .reply(200, 'ok');
+      .reply(500, 'some error');
 
     rp('http://example.com/prom-decorator')
-      .then(() => {
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
         const labels = metric.get().values[0].labels;
         expect(labels.dynamic).toBe('ok');
         done();
-      })
-      .catch(done.fail);
+      });
   });
 
   it('works with a histogram (2 requests)', done => {

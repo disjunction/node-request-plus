@@ -7,9 +7,20 @@ const wrappers = {
   prom: require('./promDecorator'),
 };
 
+/**
+ * @param {Object} [factoryOptions]
+ * @param {Object} [factoryOptions.event]
+ * @param {Object} [factoryOptions.retry]
+ * @param {Object} [factoryOptions.cache]
+ * @param {Object} [factoryOptions.prom]
+ * @param {Function} [factoryOptions.requestPromise] - alternative request-promise implementation
+ * @return {Function} - same API as request, but with .plus object set
+ */
 function me(factoryOpts) {
+  const requester = factoryOpts && factoryOpts.requestPromise || requestPromise;
+
   function replaced(uri, requestOptions, callback) {
-    return requestPromise(uri, requestOptions, callback);
+    return requester(uri, requestOptions, callback);
   }
 
   const wrap = ((decorator, opts) => {
@@ -30,7 +41,7 @@ function me(factoryOpts) {
   };
 
   if (factoryOpts) {
-    for (let wrapperName of ['event', 'retry', 'cache']) {
+    for (let wrapperName of Object.keys(wrappers)) {
       if (factoryOpts[wrapperName]) {
         replaced = replaced.plus.wrap(wrappers[wrapperName], factoryOpts[wrapperName]);
       }
@@ -43,6 +54,10 @@ function me(factoryOpts) {
 
 me.registerWrapper = function(wrapperName, wrapper) {
   wrappers[wrapperName] = wrapper;
+};
+
+me.unregisterWrapper = function(wrapperName) {
+  delete wrappers[wrapperName];
 };
 
 module.exports = me;

@@ -6,6 +6,26 @@ const cm = require('cache-manager');
 const pc = require('prom-client');
 
 describe('index', () => {
+  it('throws on unknown wrapper', () => {
+    expect(() => rpPlus().plus.wrap('bad')).toThrow();
+  });
+
+  it('supports registering custom wrappers', done => {
+    function myWrapper() {
+      return function() {
+        rpPlus.unregisterWrapper('myWrapper');
+        done();
+      };
+    }
+    rpPlus.registerWrapper('myWrapper', myWrapper);
+    const rp = rpPlus().plus.wrap('myWrapper');
+    nock('http://index0.com')
+      .get('/test-path')
+      .reply(200, 'hello foo');
+
+    rp('http://index0.com/test-path');
+  });
+
   it('does not break basic functionility', done => {
     const rp = rpPlus();
     nock('http://index0.com')

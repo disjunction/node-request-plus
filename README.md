@@ -1,4 +1,5 @@
 [![build status](https://api.travis-ci.org/disjunction/node-request-plus.png)](https://travis-ci.org/disjunction/node-request-plus)
+[![Coverage Status](https://coveralls.io/repos/github/disjunction/node-request-plus/badge.svg?branch=master)](https://coveralls.io/github/disjunction/node-request-plus?branch=master)
 
 # request-plus
 
@@ -149,7 +150,7 @@ request('http://..soooo...bad...')
 
 Params (all optional):
 * **attempts** = 3 - number of attempt before giving up
-* **delay** = 1000(ms) - delay between retries. You can provide a closure and calculate it to make a progressive delay, e.g. `attempt => 500 * attempt * attempt` 
+* **delay** = 500(ms) - delay between retries. You can provide a closure and calculate it to make a progressive delay, e.g. `attempt => 500 * attempt * attempt` 
 * **filterError** - closure defining whether a retry should be done. By default it returns `true` for a timeout and `statusCode` in `[500, 502, 503, 504]`
 
 ```javascript
@@ -176,7 +177,7 @@ Should be used together with a third-party module: [cache-manager](https://www.n
 Params:
 * **cache** (required) - an instance of cache for `cache-manager` module
 * **cacheOptions** - options used for `set()`
-* **getKey** - closure generating string cache key for given request options. By default for string param - the full URI is used as key, for an object a hash generated for it (see below)
+* **getKey** - closure generating string cache key for given request options. By default for string param - the full URI is used as key, for an object a hash is additionally generated and added to the URI (see below)
 * **hash** - hash function for default **getKey** behavior. By default it generates a key using a very cheap algorithm, but with a significant collision probability
 
 ```javascript

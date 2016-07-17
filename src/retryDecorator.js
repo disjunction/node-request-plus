@@ -5,14 +5,13 @@
 * @param {Object} [opts]
 * @param {number} [opts.attempts] - max attempts to make before giving up
 * @param {function(error: Error) : boolean} [opts.errorFiler] - returns true if we should retry
-* @param {number|function(attempt) : number} [opts.delay = 1000] - delay between retries (ms)
+* @param {number|function(attempt) : number} [opts.delay = 500] - delay between retries (ms)
 * @return {function(uri, requestOptions, callback): Promise}
 */
 function me(requester, opts) {
   opts = typeof opts === 'object' ? opts : {};
   opts.attempts = opts.attempts !== undefined ? opts.attempts : 3;
   opts.errorFilter = opts.errorFilter || me.defaultErrorFilter;
-  opts.transformDelay = opts.transformDelay || (attempt => opts.delay); // eslint-disable-line
 
   const emit = requester.plus && requester.plus.emitter
     ? requester.plus.emitter.emit.bind(requester.plus.emitter)
@@ -20,7 +19,7 @@ function me(requester, opts) {
 
   function getDelay(attempt) {
     if (!opts.delay) {
-      return 1000;
+      return 500;
     }
     return opts.delay instanceof Function
       ? opts.delay(attempt)

@@ -1,8 +1,17 @@
 'use strict';
 
+const urlLib= require('url');
 const myName = 'cacheDecorator';
 
-// http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method
+/**
+ * hashes (compresses) a full stringified request params into a short "unqiue" key
+ * implemetation taken from:
+ * http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method
+ *
+ * @param {string} str - arbitrary string (can be very long)
+ * @param {Function} requester - passed through just in case we want to access .plus object
+ * @return string - should be short enough to be used as a part of a key
+ */
 const defaultHash = function (str, requester) { // eslint-disable-line
   let hash = 0, char;
   if (!str.length) {
@@ -16,12 +25,31 @@ const defaultHash = function (str, requester) { // eslint-disable-line
   return '_' + hash;
 };
 
+/**
+ * @param {string|Object} requestParam - the first param for request
+ * @param {function(str, requester) : string} hash - string hashing function
+ * @param {Function} requester - passed through just in case we want to access .plus object
+ * @return string
+ */
 const defaultGetKey = function(requestParam, hash, requester) {
   if (typeof requestParam === 'object') {
-    if (requestParam.uri) {
-      return requestParam.uri + ' ' + request.hash(JSON.stringify(requestParam));
+    const hashString = hash(JSON.stringify(requestParam), requester);
+    let uri = requestParam.uri || requestParam.url;
+
+    // uri|url can be a url for url.parse()
+    if (typeof uri === 'object') {
+      uri = urlLib.format(uri);
+    } else if (requestParam.baseUrl) {
+      uri = urlLib.resolve(requestParam.baseUrl, uri);
     }
-    return hash(JSON.stringify(requestParam), requester);
+
+    if (uri) {
+      return uri + ' ' + hashString;
+    }
+
+    // we should normally never come here,
+    // but we still try to cache even if we failed to recognize URI
+    return hashString;
   } else {
     return requestParam;
   }
@@ -49,11 +77,11 @@ module.exports = function(requester, opts) {
 
   return function(uri, requestOptions, callback) {
     let key = getKey(uri, hash, requester);
-    emit('cacheRequest', uri, requestOptions);
+    emit('cacheRequest', key, uri, requestOptions);
     return opts.cache.wrap(
       key,
       () => {
-        emit('cacheMiss', uri, requestOptions);
+        emit('cacheMiss', key, uri, requestOptions);
         return requester(uri, requestOptions, callback);
       },
       opts.cacheOptions || {}

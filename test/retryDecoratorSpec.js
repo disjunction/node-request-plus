@@ -19,9 +19,7 @@ describe('retryDecorator', () => {
       .get('/test-path')
       .reply(200, 'hello foo');
 
-    const request = rp().plus.wrap(retryWrapper, {
-      delay: 100
-    });
+    const request = rp().plus.wrap(retryWrapper);
 
     request('http://example1.com/test-path')
       .then(body => {
