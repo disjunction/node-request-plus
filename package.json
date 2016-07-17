@@ -21,6 +21,9 @@
     "prom-client",
     "event emitter"
   ],
+  "peerDependency": {
+    "request": ">= 2.34"
+  },
   "devDependencies": {
     "cache-manager": "^1.4.0",
     "coveralls": "^2.11.11",
