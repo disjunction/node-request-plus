@@ -1,5 +1,5 @@
 [![build status](https://api.travis-ci.org/disjunction/node-request-plus.png)](https://travis-ci.org/disjunction/node-request-plus)
-[![Coverage Status](https://coveralls.io/repos/github/disjunction/node-request-plus/badge.svg?branch=master)](https://coveralls.io/github/disjunction/node-request-plus?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/disjunction/node-request-plus/badge.svg?branch=master&bust=1)](https://coveralls.io/github/disjunction/node-request-plus?branch=master)
 
 # request-plus
 
