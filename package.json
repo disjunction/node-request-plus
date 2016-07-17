@@ -21,7 +21,7 @@
     "prom-client",
     "event emitter"
   ],
-  "peerDependency": {
+  "peerDependencies": {
     "request": ">= 2.34"
   },
   "devDependencies": {
