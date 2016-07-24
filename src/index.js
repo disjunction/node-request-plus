@@ -5,6 +5,7 @@ const wrappers = {
   retry: require('./retryDecorator'),
   cache: require('./cacheDecorator'),
   prom: require('./promDecorator'),
+  log: require('./logDecorator'),
 };
 
 /**

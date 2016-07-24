@@ -12,14 +12,14 @@ module.exports = function(requester, opts) {
   const emit = emitter.emit.bind(emitter);
 
   function me(uri, requestOptions, callback) {
-    emit('request', uri, requestOptions, callback);
+    emit('request', uri);
     return requester(uri, requestOptions, callback)
     .then(body => {
-      emit('response', body, uri, requestOptions, callback);
+      emit('response', uri, body);
       return body;
     })
     .catch(error => {
-      emit('error', error, uri, requestOptions, callback);
+      emit('fail', uri, error);
       throw error;
     });
   }

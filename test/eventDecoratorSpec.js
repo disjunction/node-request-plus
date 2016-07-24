@@ -23,12 +23,12 @@ describe('eventDecorator', () => {
       .get('/test-path')
       .reply(200, 'hello foo');
 
-    rp.plus.emitter.on('response', body => {
+    rp.plus.emitter.on('response', (uri, body) => {
       expect(body).toEqual('hello foo');
       done();
     });
 
-    rp.plus.emitter.on('error', done.fail);
+    rp.plus.emitter.on('fail', done.fail);
 
     rp('http://index2.com/test-path')
       .catch(done.fail);
@@ -40,7 +40,7 @@ describe('eventDecorator', () => {
       .get('/test-path')
       .reply(500, 'hello foo');
 
-    rp.plus.emitter.on('error', error => {
+    rp.plus.emitter.on('fail', (uri, error) => {
       expect(error.statusCode).toBe(500);
       done();
     });

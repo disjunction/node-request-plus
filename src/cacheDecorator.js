@@ -14,9 +14,6 @@ const myName = 'cacheDecorator';
  */
 const defaultHash = function (str, requester) { // eslint-disable-line
   let hash = 0, char;
-  if (!str.length) {
-    return hash;
-  }
   for (let i = 0; i < str.length; i++) {
     char = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
@@ -77,11 +74,11 @@ module.exports = function(requester, opts) {
 
   return function(uri, requestOptions, callback) {
     let key = getKey(uri, hash, requester);
-    emit('cacheRequest', key, uri, requestOptions);
+    emit('cacheRequest', uri, key);
     return opts.cache.wrap(
       key,
       () => {
-        emit('cacheMiss', key, uri, requestOptions);
+        emit('cacheMiss', uri, key);
         return requester(uri, requestOptions, callback);
       },
       opts.cacheOptions || {}

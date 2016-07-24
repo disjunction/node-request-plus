@@ -226,6 +226,32 @@ const request = require('request-plus')({
 });
 ```
 
+### Log Wrapper
+
+Just outputs some some of the events to stdout/stderr. Thus **requires event wrapper**.
+
+The main intention of this plugin is just to give a simple way to switch on logging when debugging. Though with some effort you can use it also in production for logging particular events
+
+Params:
+ * **prefix** - overrides the function used to generate the prefix preceding the log information. By default it's: ```eventName => '[' + eventName + ']'```
+ * **loggers** - overrides the default console log/error/warn. See source / unit tests for more details
+ * **events** - overrides behaviour for provided events. For each event you can provide either logger name ('info', 'warn', 'error') or a function. Additionally to event parameters this function gets `eventName` as the first parameter.
+
+```javascript
+const rp = require('request-plus');
+const request = rp({
+  event: true,
+  log: {
+    events: {
+      fail: 'error',
+      retryFail: (eventName, uri, attempt, error) => {
+        console.error('failed despite retries: %j, on %d attempt', uri, attempt);
+      }
+    }
+  }
+});
+```
+
 ### Adding own wrapper
 
 ```javascript

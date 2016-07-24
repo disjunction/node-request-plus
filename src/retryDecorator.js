@@ -28,7 +28,7 @@ function me(requester, opts) {
 
   function rpWithRetry(uri, requestOptions, callback, attempt) {
     attempt = attempt || 1;
-    emit('retryRequest', uri, requestOptions, attempt);
+    emit('retryRequest', uri, attempt);
     return requester(uri, requestOptions, callback)
     .then(response => {
       if (attempt > 1) {
@@ -37,7 +37,7 @@ function me(requester, opts) {
       return response;
     })
     .catch(error => {
-      emit('retryError', error, uri, requestOptions, attempt);
+      emit('retryFail', uri, attempt, error);
       if (opts.errorFilter(error, uri, requestOptions)) {
         if (attempt <= opts.attempts - 1) {
           return new Promise(resolve => setTimeout(resolve, getDelay(attempt)))

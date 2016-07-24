@@ -32,7 +32,8 @@
     "jasme": "^4.1.2",
     "nock": "^7.2.2",
     "prom-client": "^3.4.6",
-    "request": "^2.73.0"
+    "request": "^2.73.0",
+    "rewire": "^2.5.2"
   },
   "dependencies": {
     "request-promise-native": "^1.0.0"
