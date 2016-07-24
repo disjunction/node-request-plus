@@ -9,6 +9,7 @@ A wrapper around [request-promise-native](https://www.npmjs.com/package/request-
 * automatic retry for particular failures
 * caching results using [cache-manager](https://www.npmjs.com/package/cache-manager)
 * exporting Prometheus monitoring metrics using [prom-client](https://www.npmjs.com/package/prom-client)
+* simple built-in logging based on events
 
 ... and you can add your own wrappers too!
 
@@ -26,6 +27,7 @@ const request = require('request-promise')({
   retry: { /*...*/ },
   cache: { /*...*/ },
   prom: { /*...*/ },
+  log: { /*...*/ },
 });
 // ... or ..
 const request = require('request-promise')
