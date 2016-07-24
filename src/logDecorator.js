@@ -45,12 +45,16 @@ module.exports = function(requester, opts) {
           + ' but no logger is registered for this lo action'
         );
       }
-      emitter.on(eventName, (...args) => {
-        loggers[events[eventName]](eventName, ...args);
+      emitter.on(eventName, function() {
+        const args = Array.prototype.slice.call(arguments);
+        args.unshift(eventName);
+        loggers[events[eventName]].apply(null, args);
       });
     } else {
-      emitter.on(eventName, (...args) => {
-        events[eventName](eventName, ...args);
+      emitter.on(eventName, function() {
+        const args = Array.prototype.slice.call(arguments);
+        args.unshift(eventName);
+        events[eventName].apply(null, args);
       });
     }
   }
