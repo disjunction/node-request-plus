@@ -1,7 +1,7 @@
 {
   "name": "request-plus",
   "version": "0.0.3",
-  "description": "advanced http client: request + promise + retries + EventEmitter + cache-manager + prom-client",
+  "description": "advanced promisified http client with retries, EventEmitter, cache-manager, prom-client and logging",
   "main": "src/index.js",
   "scripts": {
     "test": "./node_modules/jasme/run.js"

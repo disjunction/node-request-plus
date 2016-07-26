@@ -3,7 +3,9 @@
 
 # request-plus
 
-A set of wrappers around [request-promise-native](https://www.npmjs.com/package/request-promise-native) module, adding the following features (all are optional and mostly independent):
+If you like `request` and/or `request-promise`, then you are good to go with this add-on!
+
+It is a set of wrappers around [request-promise-native](https://www.npmjs.com/package/request-promise-native) module, adding the following features (all are optional and mostly independent):
 
 * [EventEmitter integration](#event-wrapper) - you can set a generic listener for any fired/successful/failed request
 * [automatic retry for particular failures](#retry-wrapper)
