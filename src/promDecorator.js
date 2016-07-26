@@ -17,13 +17,22 @@ module.exports = function(requester, opts) {
   const isTimer = ['gauge', 'histogram', 'summary'].indexOf(type) >= 0;
 
   function getLabels(error, uri, requestOptions) {
+    let labels;
     if (opts.labels) {
       if (opts.labels instanceof Function) {
-        return opts.labels(error, uri, requestOptions, metric);
+        labels = opts.labels(error, uri, requestOptions, metric);
       } else {
-        return opts.labels;
+        labels = opts.labels;
       }
+    } else {
+      labels = {};
     }
+    if (metric.labelNames.indexOf('status_code') >= 0)  {
+      labels['status_code'] = error && error.response
+        ? error.response.statusCode
+        : 200;
+    }
+    return labels;
   }
 
   function me(uri, requestOptions, callback) {

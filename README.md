@@ -13,41 +13,32 @@ A wrapper around [request-promise-native](https://www.npmjs.com/package/request-
 
 ... and you can add your own wrappers too!
 
-The only depency is `request-promise-native`, which in its turn has a `request` as a peer dependecy. So you can flexibly use whatever request version you like.
+The only depency is `request-promise-native`, which has `request` as a peer dependecy. So you can flexibly use whatever `request` version you like.
 
-## Usage
+## Basic Example
 ```
 npm install request request-plus
 ```
 
 ```javascript
-// here all wrappers are optional
 const request = require('request-promise')({
-  event: { /*...*/ },
-  retry: { /*...*/ },
-  cache: { /*...*/ },
-  prom: { /*...*/ },
-  log: { /*...*/ },
+  event: true,
+  retry: true,
+  log: true,
 });
-// ... or ..
-const request = require('request-promise')
-  .plus.add('event', { /*...*/ })
-  .plus.add(/* wnother wrapper name * /, { /*...*/ })
-  .plus.add(/* wnother wrapper name * /, { /*...*/ })
-  // ...
 
 request('http://example.com/some/api')
-  .then(data => { /*...*/ })
+  .then(body => { console.log('response was: ' + body)})
   .catch(error => { /*...*/ });
 ```
 
-## Basic Example
+## Advanced Example
+
+Let's say we want to get JSON data from some resource, which fails sometimes and is in general quite slow. So we want to cache its results and do retries if it fails with a timeout or typical server errors. To implement caching we need to install additionally `cache-manager`
 
 ```
 npm install request request-plus cache-manager --save
 ```
-
-Let's say we want to get JSON data from some resource, which fails sometimes and is in general quite slow. So we want to cache its results and do retries if it fails with a timeout or typical server errors.
 
 ```javascript
 // setup a cache object
@@ -94,7 +85,7 @@ request({
 
 The wrappers can be specified in options when creating a new requestPlus wrapper (simple way), or you can add them one by one (advanced)
 
-When specified in options, the wrappers will be added in a particular (common sense) order, namely: `event`, `retry`, `cache`, `prom`. Another limitation here: you can have only one wrapper of each type.
+When specified in options, the wrappers will be added in a particular (common sense) order, namely: `event`, `retry`, `cache`, `prom`, `log`. Another limitation here: you can have only one wrapper of each type.
 
 Sample:
 ```javascript
@@ -127,9 +118,9 @@ const request = rp()
 This wrapper adds `emitter` to the `.plus` container
 and fires basic events for each request going through:
 
-* request - on start of the request
-* error - on error
-* response - on successful response
+* `request` - on start of the request
+* `error` - on error
+* `response` - on successful response
 
 ```javascript
 const request = require('request-plus')({event: true});
@@ -137,7 +128,7 @@ const request = require('request-plus')({event: true});
 // always output failed http requests to std error
 // together with used request param
 // independent of promise chains/catch clauses
-request.plus.emitter.on('error', (error, uri) => {
+request.plus.emitter.on('error', (uri, error) => {
   console.error('http request failed %j', uri);
 })
 request('http://..soooo...bad...')
@@ -146,7 +137,9 @@ request('http://..soooo...bad...')
 }) 
 ```
 
-(see sourcecode to see additional params provided for each event)
+All events have `uri` (which can be a string or options object)
+as the first parameter. Other parameters depend on the event -
+see source code to see additional params provided for each event
 
 ### Retry Wrapper
 
@@ -200,9 +193,11 @@ If there is an `event` wrapper initialised, then it will additionally fire event
 
 Should be used together with a third-party module: [prom-client](https://www.npmjs.com/package/prom-client)
 
-The wrapper takes a prometheus metric and uses it to monitor both successful responses and error. It supports all basic metric types assuming that `Counter` just counts responses and `Gauge`, `Histogram` and `Summary` measure latency.
+The wrapper takes a prometheus metric and uses it to monitor both successful and error responses. It supports all basic metric types assuming that `Counter` just counts responses and `Gauge`, `Histogram` and `Summary` measure latency.
 
-If this wrapper doesn't need your needs, you might want do your own measurements using `event` wrapper (see above).
+If the metric has `status_code` label, then it will be automatically set for each request.
+
+If this wrapper doesn't meet your needs, you can add your own measurements using `event` wrapper (see above).
 
 Params:
  * **metric** - and instance of prom-client metric
@@ -213,16 +208,19 @@ const promClient = require('prom-client');
 const testHistogram = new promClient.Histogram(
   'test_histogram',
   'help of test_histogram',
-  {
-    buckets: [0.01, 1],
-    labels: ["status_code"]
-  }
+  ['status_code', 'nature']
+  {buckets: [0.1, 1]}
 );
 const request = require('request-plus')({
   prom: {
     metric: testHistogram,
     labels: error => {
-      status_code: error ? error.statusCode : 200
+      if (!error) {
+        return {nature: 'success'};
+      }
+      return error.respose.statusCode === 418
+        ? {nature: 'teapot'}
+        : {}
     }
   }
 });
@@ -230,7 +228,7 @@ const request = require('request-plus')({
 
 ### Log Wrapper
 
-Just outputs some some of the events to stdout/stderr. Thus **requires event wrapper**.
+Just outputs some some of the events to stdout/stderr. Thus it **requires event wrapper**.
 
 The main intention of this plugin is just to give a simple way to switch on logging when debugging. Though with some effort you can use it also in production for logging particular events
 

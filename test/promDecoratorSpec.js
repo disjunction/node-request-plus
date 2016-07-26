@@ -14,7 +14,7 @@ describe('promDecorator', () => {
   });
 
   it('works with a counter (2 requests)', done => {
-    const metric = new promClient.Counter('test_counter', 'help');
+    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
 
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
@@ -32,9 +32,31 @@ describe('promDecorator', () => {
       .then(result => {
         expect(result).toBe('ok');
         expect(metric.get().values[0].value).toBe(2);
+        expect(metric.get().values[0].labels.status_code).toBe(200);
         done();
       })
       .catch(done.fail);
+  });
+
+  it('status_code is set for error response', done => {
+    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
+
+    const rp = requestPlus()
+      .plus.wrap(promDecorator, {
+        metric: metric
+      });
+
+    nock('http://example.com')
+      .get('/prom-decorator1')
+      .reply(404, 'not found');
+
+    rp('http://example.com/prom-decorator1')
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
+        expect(metric.get().values[0].value).toBe(1);
+        expect(metric.get().values[0].labels.status_code).toBe(404);
+        done();
+      });
   });
 
   it('supports static labels', done => {
@@ -118,6 +140,33 @@ describe('promDecorator', () => {
         expect(result).toBe('ok');
         // resulting values: 0.01, 1, +Inf, sum, count
         expect(metric.get().values.length).toBe(5);
+        done();
+      })
+      .catch(done.fail);
+  });
+
+  it('status_code label works with histogram', done => {
+    const metric = new promClient.Histogram(
+      'test_histogram',
+      'help',
+      ['some', 'status_code'],
+      {buckets: [10, 20]}
+    );
+
+    const rp = requestPlus()
+      .plus.wrap(promDecorator, {
+        metric: metric
+      });
+
+    nock('http://example.com')
+        .get('/prom-decorator123')
+        .reply(200, 'ok');
+
+    rp('http://example.com/prom-decorator123')
+      .then(result => {
+        expect(result).toBe('ok');
+        expect(metric.get().values[0].value).toBe(1);
+        expect(metric.get().values[0].labels.status_code).toBe(200);
         done();
       })
       .catch(done.fail);

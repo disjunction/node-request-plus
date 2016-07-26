@@ -30,14 +30,14 @@ function me(requester, opts) {
     attempt = attempt || 1;
     emit('retryRequest', uri, attempt);
     return requester(uri, requestOptions, callback)
-    .then(response => {
+    .then(body => {
       if (attempt > 1) {
-        emit('retryResponse', uri, requestOptions, attempt);
+        emit('retryResponse', uri, body, attempt);
       }
-      return response;
+      return body;
     })
     .catch(error => {
-      emit('retryFail', uri, attempt, error);
+      emit('retryFail', uri, error, attempt);
       if (opts.errorFilter(error, uri, requestOptions)) {
         if (attempt <= opts.attempts - 1) {
           return new Promise(resolve => setTimeout(resolve, getDelay(attempt)))
