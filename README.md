@@ -3,15 +3,15 @@
 
 # request-plus
 
-A wrapper around [request-promise-native](https://www.npmjs.com/package/request-promise-native) module, adding the following features (all are optional):
+A set of wrappers around [request-promise-native](https://www.npmjs.com/package/request-promise-native) module, adding the following features (all are optional and mostly independent):
 
-* `EventEmitter` integration - you can set a generic listener for any fired/successful/failed request
-* automatic retry for particular failures
-* caching results using [cache-manager](https://www.npmjs.com/package/cache-manager)
-* exporting Prometheus monitoring metrics using [prom-client](https://www.npmjs.com/package/prom-client)
-* simple built-in logging based on events
+* [EventEmitter integration](#event-wrapper) - you can set a generic listener for any fired/successful/failed request
+* [automatic retry for particular failures](#retry-wrapper)
+* [caching results](#cache-wrapper) using [cache-manager](https://www.npmjs.com/package/cache-manager)
+* [exporting Prometheus monitoring metrics](#prom-wrapper) using [prom-client](https://www.npmjs.com/package/prom-client)
+* [simple built-in logging](#log-wrapper) based on events
 
-... and you can add your own wrappers too!
+... and you can [add your own wrappers](#adding-custom-wrapper) too!
 
 The only depency is `request-promise-native`, which has `request` as a peer dependecy. So you can flexibly use whatever `request` version you like.
 
@@ -252,7 +252,7 @@ const request = rp({
 });
 ```
 
-### Adding own wrapper
+### Adding custom wrapper
 
 ```javascript
 function myWrapper(requester) {
