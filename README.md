@@ -8,7 +8,7 @@ A set of wrappers around [request-promise-native](https://www.npmjs.com/package/
 * [EventEmitter integration](#event-wrapper) - you can set a generic listener for any fired/successful/failed request
 * [automatic retry for particular failures](#retry-wrapper)
 * [caching results](#cache-wrapper) using [cache-manager](https://www.npmjs.com/package/cache-manager)
-* [exporting Prometheus monitoring metrics](#prom-wrapper) using [prom-client](https://www.npmjs.com/package/prom-client)
+* [exporting Prometheus monitoring metrics](#prometheus-wrapper) using [prom-client](https://www.npmjs.com/package/prom-client)
 * [simple built-in logging](#log-wrapper) based on events
 
 ... and you can [add your own wrappers](#adding-custom-wrapper) too!
