@@ -87,4 +87,22 @@ describe('multiple wraps', () => {
       .catch(done.fail);
   });
 
+  it('properly processes ENOTFOUND', done => {
+    const rp = rpPlus({
+      retry: true,
+      event: true,
+      log: {
+        loggers: {
+          info: () => {},
+          error: () => {}
+        }
+      }
+    });
+    rp('http://9000Gahata9000Brzeczyszczykiewicz9000.com')
+      .then(() => done.fail('unexpected success'))
+      .catch(error => {
+        expect(error.error.code).toBe('ENOTFOUND');
+        done();
+      });
+  });
 });

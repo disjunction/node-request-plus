@@ -93,5 +93,27 @@ describe('retryDecorator', () => {
       .then(done)
       .catch(done.fail);
   });
+
+  it('retries timeout', done => {
+    // this should fail unless timeout is caught
+    // before 403 comes through
+    nock('http://example5.com')
+      .get('/test-path')
+      .delayConnection(500)
+      .reply(403, 'not found');
+
+    nock('http://example5.com')
+      .get('/test-path')
+      .reply(200, 'hello foo');
+
+    const request = rp().plus.wrap(retryWrapper);
+    request({
+      uri: 'http://example5.com/test-path',
+      timeout: 100
+    })
+      .then(done)
+      .catch(done.fail);
+  });
+
 });
 

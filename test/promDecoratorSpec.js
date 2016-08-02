@@ -40,7 +40,6 @@ describe('promDecorator', () => {
 
   it('status_code is set for error response', done => {
     const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
-
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
         metric: metric
@@ -58,6 +57,93 @@ describe('promDecorator', () => {
         done();
       });
   });
+
+  it('status_code is set for ENOTFOUND', done => {
+    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
+    const rp = requestPlus()
+      .plus.wrap(promDecorator, {
+        metric: metric
+      });
+
+    rp('http://9000Gahata9000Brzeczyszczykiewicz9000.com')
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
+        expect(metric.get().values[0].value).toBe(1);
+        expect(metric.get().values[0].labels.status_code).toBe('ENOTFOUND');
+        done();
+      });
+  });
+
+  it('status_code is set for ETIMEDOUT', done => {
+    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
+    const rp = requestPlus()
+      .plus.wrap(promDecorator, {
+        metric: metric
+      });
+
+    nock('http://example.com')
+      .get('/prom-decorator_timeout')
+      .delayConnection(500)
+      .reply(404, 'not found');
+
+    rp({
+      uri: 'http://example.com/prom-decorator_timeout',
+      timeout: 100
+    })
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
+        expect(metric.get().values[0].value).toBe(1);
+        expect(metric.get().values[0].labels.status_code).toBe('ETIMEDOUT');
+        done();
+      });
+  });
+
+  it('status_code is set to UNKNOWN for custom errors', done => {
+    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
+
+    function throwerWrapper() {
+      return () => {
+        return Promise.reject(new Error('whatever'));
+      };
+    }
+
+    const rp = requestPlus()
+      .plus.wrap(throwerWrapper)
+      .plus.wrap(promDecorator, {
+        metric: metric
+      });
+
+    rp('http://example.com/prom-decorator_unknown')
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
+        expect(metric.get().values[0].value).toBe(1);
+        expect(metric.get().values[0].labels.status_code).toBe('UNKNOWN');
+        done();
+      });
+  });
+
+  it('throws on unknown object passed as cache', () => {
+    const metric = {wt: 'f'};
+    expect(() => {
+      requestPlus()
+        .plus.wrap(promDecorator, {
+          metric: metric
+        });
+    }).toThrow();
+  });
+
+  it('throws on unsupported metric type', () => {
+    const metric = {get: () => {
+      return {type: 'wtf'};
+    }};
+    expect(() => {
+      requestPlus()
+        .plus.wrap(promDecorator, {
+          metric: metric
+        });
+    }).toThrow();
+  });
+
 
   it('supports static labels', done => {
     const metric = new promClient.Counter(

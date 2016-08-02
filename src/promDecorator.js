@@ -13,8 +13,15 @@ module.exports = function(requester, opts) {
   }
 
   const metric = opts.metric;
+  if (!metric.get) {
+    throw new Error('unexpected object passed as prom metric.'
+        + ' It should have method get()');
+  }
   const type = metric.get().type;
   const isTimer = ['gauge', 'histogram', 'summary'].indexOf(type) >= 0;
+  if (!isTimer && type !== 'counter') {
+    throw new Error('unexpected metric type: ' + type);
+  }
 
   function getLabels(error, uri, requestOptions) {
     let labels;
@@ -28,9 +35,19 @@ module.exports = function(requester, opts) {
       labels = {};
     }
     if (metric.labelNames.indexOf('status_code') >= 0)  {
-      labels['status_code'] = error && error.response
-        ? error.response.statusCode
-        : 200;
+      let statusCode;
+      if (error) {
+        if (error.response) {
+          statusCode = error.response.statusCode;
+        } else if (error.error && error.error.code) {
+          statusCode = error.error.code;
+        } else {
+          statusCode = 'UNKNOWN';
+        }
+      } else {
+        statusCode = 200;
+      }
+      labels['status_code'] = statusCode;
     }
     return labels;
   }
@@ -47,7 +64,7 @@ module.exports = function(requester, opts) {
       const currentLabels = getLabels(error, uri, requestOptions);
       if (type === 'counter') {
         metric.inc(currentLabels, opts.value || 1);
-      } else if (isTimer) {
+      } else { // this can only be a timer
         Object.assign(labels, currentLabels);
         timer();
       }

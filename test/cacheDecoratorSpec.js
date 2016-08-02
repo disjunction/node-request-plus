@@ -123,5 +123,24 @@ describe('cacheDecorator', () => {
         done();
       });
   });
-});
 
+  it('also supports strange requests with no uri and alike', done => {
+    function successWrapper() {
+      return () => {
+        return Promise.resolve('everything is fine');
+      };
+    }
+
+    const request = cacheWrapper(successWrapper, {
+      cache: cache
+    });
+
+    request({
+      veryStrangeRequest: 'aliens://example.com',
+    })
+      .then(() => {
+        done();
+      })
+      .catch(done.fail);
+  });
+});

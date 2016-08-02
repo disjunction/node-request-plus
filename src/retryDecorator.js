@@ -53,8 +53,25 @@ function me(requester, opts) {
 const retryCodes = [500, 502, 503, 504];
 
 me.defaultErrorFilter = function (error, uri, requestOptions) { // eslint-disable-line
-  return (error.message === 'Error: ETIMEDOUT')
+  return me.isRetriableNetworkError(error)
     || (retryCodes.indexOf(error.statusCode) >= 0);
+};
+
+// taken from requestretry with ENOTFOUND excluded
+me.retriableNetworkErrors = [
+  'ECONNRESET',
+  'ESOCKETTIMEDOUT',
+  'ETIMEDOUT',
+  'ECONNREFUSED',
+  'EHOSTUNREACH',
+  'EPIPE',
+  'EAI_AGAIN'
+];
+
+me.isRetriableNetworkError = function(error) {
+  return error
+    && error.error
+    && me.retriableNetworkErrors.indexOf(error.error.code) >= 0;
 };
 
 module.exports = me;

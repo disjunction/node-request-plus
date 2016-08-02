@@ -1,6 +1,6 @@
 {
   "name": "request-plus",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "advanced promisified http client with retries, EventEmitter, cache-manager, prom-client and logging",
   "main": "src/index.js",
   "scripts": {
