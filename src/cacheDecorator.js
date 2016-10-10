@@ -13,13 +13,12 @@ const myName = 'cacheDecorator';
  * @return string - should be short enough to be used as a part of a key
  */
 const defaultHash = function (str, requester) { // eslint-disable-line
-  let hash = 0, char;
+  let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
     hash = hash & hash; // Convert to 32bit integer
   }
-  return '_' + hash;
+  return (hash >>> 0).toString(16); // convert to unsigned int, and convert to hex
 };
 
 /**
