@@ -1,6 +1,6 @@
 {
   "name": "request-plus",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "advanced promisified http client with retries, EventEmitter, cache-manager, prom-client and logging",
   "main": "src/index.js",
   "scripts": {
@@ -30,7 +30,7 @@
     "coveralls": "^2.11.11",
     "eslint": "^3.0.1",
     "istanbul": "^0.4.4",
-    "jasme": "^4.1.2",
+    "jasme": "^5.2.0",
     "nock": "^7.2.2",
     "prom-client": "^3.4.6",
     "request": "^2.73.0",

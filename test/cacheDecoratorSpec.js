@@ -37,7 +37,7 @@ describe('cacheDecorator', () => {
       .catch(done.fail);
   });
 
-  it('works with object request param', done => {
+  it('works with object request param and pool is ignored', done => {
     nock('http://example.com')
       .get('/json/api')
       .reply(200, '{"a": 123}', {
@@ -48,6 +48,7 @@ describe('cacheDecorator', () => {
 
     request({
       uri: 'http://example.com/json/api',
+      pool: {whatever: 123},
       json: true
     })
       .then(body => {

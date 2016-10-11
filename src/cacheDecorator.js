@@ -29,6 +29,10 @@ const defaultHash = function (str, requester) { // eslint-disable-line
  */
 const defaultGetKey = function(requestParam, hash, requester) {
   if (typeof requestParam === 'object') {
+    if (requestParam.pool) {
+      requestParam = Object.assign({}, requestParam);
+      delete requestParam.pool;
+    }
     const hashString = hash(JSON.stringify(requestParam), requester);
     let uri = requestParam.uri || requestParam.url;
 
