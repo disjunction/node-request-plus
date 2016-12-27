@@ -105,4 +105,62 @@ describe('multiple wraps', () => {
         done();
       });
   });
+
+  it('can be forked to create INDEPENDENT requesters', done => {
+    const base = rpPlus({
+      retry: true,
+      event: true,
+      log: {
+        loggers: {
+          info: () => {},
+          error: () => {}
+        }
+      }
+    });
+
+    let aCounter;
+    let bCounter;
+
+    const a = base.plus.wrap(function (requester) {
+      return function(uri, requestOptions, callback) {
+        aCounter++;
+        return requester(uri, requestOptions, callback);
+      };
+    });
+
+    const b = base.plus.wrap(function (requester) {
+      return function(uri, requestOptions, callback) {
+        bCounter++;
+        return requester(uri, requestOptions, callback);
+      };
+    });
+
+    aCounter = bCounter = 0;
+    a('http://9000Gahata9000Brzeczyszczykiewicz9000.com')
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
+        expect(aCounter).toBe(1);
+        expect(bCounter).toBe(0);
+      })
+      .then(() => a('http://9000Gahata9000Brzeczyszczykiewicz9000.com'))
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
+        expect(aCounter).toBe(2);
+        expect(bCounter).toBe(0);
+      })
+      .then(() => b('http://9000Gahata9000Brzeczyszczykiewicz9000.com'))
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
+        expect(aCounter).toBe(2);
+        expect(bCounter).toBe(1);
+      })
+      .then(() => a('http://9000Gahata9000Brzeczyszczykiewicz9000.com'))
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {
+        expect(aCounter).toBe(3);
+        expect(bCounter).toBe(1);
+        done();
+      });
+  });
+
 });

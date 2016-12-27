@@ -10,6 +10,10 @@ describe('index', () => {
     expect(() => rpPlus().plus.wrap('bad')).toThrow();
   });
 
+  it('throws on bad custom wrapper', () => {
+    expect(() => rpPlus().plus.wrap({something: 'strange'})).toThrow();
+  });
+
   it('supports registering custom wrappers', done => {
     function myWrapper() {
       return function() {
@@ -79,4 +83,3 @@ describe('index', () => {
       .catch(done.fail);
   });
 });
-

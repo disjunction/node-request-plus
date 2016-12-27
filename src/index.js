@@ -17,6 +17,29 @@ const wrappers = {
  * @param {Function} [factoryOptions.requestPromise] - alternative request-promise implementation
  * @return {Function} - same API as request, but with .plus object set
  */
+
+
+class RequestPlus {
+  constructor(wrapped, ancestor) {
+    for (let key in ancestor) {
+      this[key] = ancestor[key];
+    }
+    this.wrapped = wrapped;
+  }
+
+  wrap(decorator, opts) {
+    if (typeof decorator === 'string') {
+      if (!wrappers[decorator]) {
+        throw new Error('unknown request-plus wrapper: ' + decorator);
+      }
+      decorator = wrappers[decorator];
+    }
+    const newReplaced = decorator(this.wrapped, opts);
+    newReplaced.plus = new RequestPlus(newReplaced, this.wrapped.plus);
+    return newReplaced;
+  }
+}
+
 function me(factoryOpts) {
   const requester = factoryOpts && factoryOpts.requestPromise || requestPromise;
 
@@ -24,22 +47,7 @@ function me(factoryOpts) {
     return requester(uri, requestOptions, callback);
   }
 
-  const wrap = ((decorator, opts) => {
-    if (typeof decorator === 'string') {
-      if (!wrappers[decorator]) {
-        throw new Error('unknown request-plus wrapper: ' + decorator);
-      }
-      decorator = wrappers[decorator];
-    }
-    const newReplaced = decorator(replaced, opts);
-    newReplaced.plus = Object.assign({}, replaced.plus, {wrap: wrap});
-    replaced = newReplaced;
-    return replaced;
-  });
-
-  replaced.plus = {
-    wrap: wrap
-  };
+  replaced.plus = new RequestPlus(replaced);
 
   if (factoryOpts) {
     for (let wrapperName of Object.keys(wrappers)) {
