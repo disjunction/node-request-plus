@@ -33,7 +33,7 @@
     "jasme": "^5.2.0",
     "nock": "^9.0.2",
     "prom-client": "^6.3.0",
-    "request": "^2.73.0",
+    "request": "2.75.0",
     "rewire": "^2.5.2"
   },
   "dependencies": {
