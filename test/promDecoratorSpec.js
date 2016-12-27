@@ -6,6 +6,10 @@ const nock = require('nock');
 const promClient = require('prom-client');
 
 describe('promDecorator', () => {
+  beforeEach(() => {
+    promClient.register.clear();
+  });
+
   it('fails if no metric is provided', () => {
     expect(() => {
       requestPlus().plus.wrap(promDecorator);
