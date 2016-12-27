@@ -41,7 +41,8 @@ describe('logDecorator', () => {
       .reply(500, 'failed');
 
     rp('http://index-log1.com/test-path')
-      .then(() => done.fail('unexpected success'));
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {});
   });
 
   it('calls error callback for failed request', done => {
@@ -63,7 +64,8 @@ describe('logDecorator', () => {
       .reply(500, 'failed');
 
     rp('http://index-log2.com/test-path')
-      .then(() => done.fail('unexpected success'));
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {});
   });
 
   it('uses std. console', done => {
@@ -83,7 +85,8 @@ describe('logDecorator', () => {
       .reply(500, 'failed');
 
     rp('http://index-log2.com/test-path')
-      .then(() => done.fail('unexpected success'));
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {});
   });
 
   it('warn also works', done => {
@@ -107,7 +110,8 @@ describe('logDecorator', () => {
       .reply(500, 'failed');
 
     rp('http://index-log2.com/test-path')
-      .then(() => done.fail('unexpected success'));
+      .then(() => done.fail('unexpected success'))
+      .catch(() => {});
   });
 
   it('throws without emitter', () => {
