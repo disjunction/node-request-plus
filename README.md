@@ -115,6 +115,31 @@ const request = rp()
   });
 ```
 
+### Defaults Wrapper
+
+Sets default options for requests. You can use it for headers
+or if you know all your requets expect json.
+
+```javascript
+const request = require('request-plus')({
+  defaults: {
+    headers: {
+      'User-Agent': 'My request-plus client'
+    },
+    json: true
+  }
+});
+
+// this will send a request with json:true preset
+// and with the custom User-Agent header
+request('http://some.service.com/products')
+  .then(data => {
+    if (data.product.length) {
+      /* ... */
+    }
+  });
+```
+
 ### Event Wrapper
 
 This wrapper adds `emitter` to the `.plus` container
@@ -136,7 +161,7 @@ request.plus.emitter.on('error', (uri, error) => {
 request('http://..soooo...bad...')
 .catch(() => {
   console.log("something happen, i don't know what");
-}) 
+})
 ```
 
 All events have `uri` (which can be a string or options object)
@@ -147,7 +172,7 @@ see source code to see additional params provided for each event
 
 Params (all optional):
 * **attempts** = 3 - number of attempt before giving up
-* **delay** = 500(ms) - delay between retries. You can provide a closure and calculate it to make a progressive delay, e.g. `attempt => 500 * attempt * attempt` 
+* **delay** = 500(ms) - delay between retries. You can provide a closure and calculate it to make a progressive delay, e.g. `attempt => 500 * attempt * attempt`
 * **filterError** - closure defining whether a retry should be done. By default it returns `true` for a timeout and `statusCode` in `[500, 502, 503, 504]`
 
 ```javascript
