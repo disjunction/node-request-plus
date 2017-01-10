@@ -1,6 +1,7 @@
 'use strict';
 const requestPromise = require('request-promise-native');
 const wrappers = {
+  defaults: require('./defaultsDecorator'),
   event: require('./eventDecorator'),
   retry: require('./retryDecorator'),
   cache: require('./cacheDecorator'),
