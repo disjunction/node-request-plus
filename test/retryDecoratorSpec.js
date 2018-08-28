@@ -115,5 +115,12 @@ describe('retryDecorator', () => {
       .catch(done.fail);
   });
 
+
+  it('accepts immutable retry config.', done => {
+    rp().plus.wrap(retryWrapper, Object.freeze({
+      attempts: 2
+    }));
+    done();
+  });
 });
 
