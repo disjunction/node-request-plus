@@ -65,7 +65,7 @@ describe('retryDecorator', () => {
     const request = rp().plus.wrap(retryWrapper, {
       delay: 100
     });
-    request('http://example.com/test-path')
+    request('http://example3.com/test-path')
       .then(() => {
         done.fail('unexpected success');
       })
