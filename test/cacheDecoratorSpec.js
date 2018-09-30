@@ -1,7 +1,7 @@
 /* eslint-env jasmine */
 'use strict';
 
-const rp = require('request-promise-native');
+const rp = require('request-promise-any');
 const cacheWrapper = require('../src/cacheDecorator');
 const nock = require('nock');
 const cm = require('cache-manager');

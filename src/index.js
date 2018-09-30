@@ -1,5 +1,5 @@
 'use strict';
-const requestPromise = require('request-promise-native');
+const requestPromise = require('request-promise-any');
 const wrappers = {
   defaults: require('./defaultsDecorator'),
   event: require('./eventDecorator'),
@@ -18,7 +18,6 @@ const wrappers = {
  * @param {Function} [factoryOptions.requestPromise] - alternative request-promise implementation
  * @return {Function} - same API as request, but with .plus object set
  */
-
 
 class RequestPlus {
   constructor(wrapped, ancestor) {

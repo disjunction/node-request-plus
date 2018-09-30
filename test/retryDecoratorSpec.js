@@ -50,7 +50,7 @@ describe('retryDecorator', () => {
       .then(() => {
         done.fail('unexpected success');
       })
-      .catch(done);
+      .catch(() => done());
   });
 
   it('fails for statusCode=404 without retry', done => {
@@ -69,7 +69,7 @@ describe('retryDecorator', () => {
       .then(() => {
         done.fail('unexpected success');
       })
-      .catch(done);
+      .catch(() => done());
   });
 
   it('uses delay and errorFilter closuers', done => {

@@ -5,6 +5,14 @@ const requestPlus = require('../src/index');
 const nock = require('nock');
 const promClient = require('prom-client');
 
+function makeCounter() {
+  return new promClient.Counter({
+    name: 'test_counter',
+    help: 'help',
+    labelNames: ['status_code']
+  });
+}
+
 describe('promDecorator', () => {
   beforeEach(() => {
     promClient.register.clear();
@@ -18,8 +26,7 @@ describe('promDecorator', () => {
   });
 
   it('works with a counter (2 requests)', done => {
-    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
-
+    const metric = makeCounter();
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
         metric: metric
@@ -43,7 +50,7 @@ describe('promDecorator', () => {
   });
 
   it('status_code is set for error response', done => {
-    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
+    const metric = makeCounter();
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
         metric: metric
@@ -63,7 +70,7 @@ describe('promDecorator', () => {
   });
 
   it('status_code is set for ENOTFOUND', done => {
-    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
+    const metric = makeCounter();
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
         metric: metric
@@ -79,7 +86,7 @@ describe('promDecorator', () => {
   });
 
   it('status_code is set for ETIMEDOUT', done => {
-    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
+    const metric = makeCounter();
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
         metric: metric
@@ -97,14 +104,13 @@ describe('promDecorator', () => {
       .then(() => done.fail('unexpected success'))
       .catch(() => {
         expect(metric.get().values[0].value).toBe(1);
-        expect(metric.get().values[0].labels.status_code).toBe('ETIMEDOUT');
+        expect(metric.get().values[0].labels.status_code).toBe('ESOCKETTIMEDOUT');
         done();
       });
   });
 
   it('status_code is set to UNKNOWN for custom errors', done => {
-    const metric = new promClient.Counter('test_counter', 'help', ['status_code']);
-
+    const metric = makeCounter();
     function throwerWrapper() {
       return () => {
         return Promise.reject(new Error('whatever'));
@@ -150,11 +156,11 @@ describe('promDecorator', () => {
 
 
   it('supports static labels', done => {
-    const metric = new promClient.Counter(
-      'test_counter',
-      'help',
-      ['label1', 'label2']
-    );
+    const metric = new promClient.Counter({
+      name: 'test_counter',
+      help: 'help',
+      labelNames: ['label1', 'label2']
+    });
 
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
@@ -181,7 +187,11 @@ describe('promDecorator', () => {
 
 
   it('support dynamic labels', done => {
-    const metric = new promClient.Gauge('test_gauge', 'help', ['dynamic']);
+    const metric = new promClient.Gauge({
+      name: 'test_gauge',
+      help: 'help',
+      labelNames: ['dynamic']
+    });
 
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
@@ -207,11 +217,11 @@ describe('promDecorator', () => {
   });
 
   it('works with a histogram (2 requests)', done => {
-    const metric = new promClient.Histogram(
-      'test_histogram',
-      'help',
-      {buckets: [0.01, 1]}
-    );
+    const metric = new promClient.Histogram({
+      name: 'test_histogram',
+      help: 'help',
+      buckets: [0.01, 1]
+    });
 
     const rp = requestPlus()
       .plus.wrap(promDecorator, {
@@ -236,12 +246,12 @@ describe('promDecorator', () => {
   });
 
   it('status_code label works with histogram', done => {
-    const metric = new promClient.Histogram(
-      'test_histogram',
-      'help',
-      ['some', 'status_code'],
-      {buckets: [10, 20]}
-    );
+    const metric = new promClient.Histogram({
+      name: 'test_histogram',
+      help: 'help',
+      labelNames: ['some', 'status_code'],
+      buckets: [10, 20]
+    });
 
     const rp = requestPlus()
       .plus.wrap(promDecorator, {

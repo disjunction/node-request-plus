@@ -1,6 +1,6 @@
 {
   "name": "request-plus",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "advanced promisified http client with retries, EventEmitter, cache-manager, prom-client and logging",
   "main": "src/index.js",
   "scripts": {
@@ -22,21 +22,24 @@
     "event emitter",
     "logging"
   ],
+  "engines": {
+    "node": ">= 6"
+  },
   "peerDependencies": {
-    "request": ">= 2.34"
+    "request": "^2.34"
   },
   "devDependencies": {
-    "cache-manager": "^2.3.0",
-    "coveralls": "^2.11.11",
-    "eslint": "^3.0.1",
-    "istanbul": "^0.4.4",
-    "jasme": "^5.2.0",
-    "nock": "^9.0.2",
-    "prom-client": "^6.3.0",
-    "request": "2.75.0",
-    "rewire": "^2.5.2"
+    "cache-manager": "^2.9.0",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.6.1",
+    "istanbul": "^0.4.5",
+    "jasme": "^6.0.0",
+    "nock": "^10.0.0",
+    "prom-client": "^11.1.3",
+    "rewire": "^4.0.1",
+    "request": "^2.88.0"
   },
   "dependencies": {
-    "request-promise-native": "^1.0.0"
+    "request-promise-any": "^1.0.5"
   }
 }

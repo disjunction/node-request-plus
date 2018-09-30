@@ -49,7 +49,7 @@ describe('index', () => {
       event: true,
       retry: true,
       cache: {cache: cm.caching({store: 'memory'})},
-      prom: {metric: new pc.Counter('some', 'some_help')},
+      prom: {metric: new pc.Counter({name: 'some', help: 'some_help'})},
       log: {events: {}}, // mute aall events
     });
 
