@@ -8,8 +8,8 @@
 * @param {number|function(attempt) : number} [opts.delay = 500] - delay between retries (ms)
 * @return {function(uri, requestOptions, callback): Promise}
 */
-function me(requester, opts) {
-  opts = typeof opts === 'object' ? opts : {};
+function me(requester, passedOpts) {
+  const opts = Object.assign({},passedOpts);
   opts.attempts = opts.attempts !== undefined ? opts.attempts : 3;
   opts.errorFilter = opts.errorFilter || me.defaultErrorFilter;
 

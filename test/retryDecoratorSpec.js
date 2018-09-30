@@ -65,7 +65,7 @@ describe('retryDecorator', () => {
     const request = rp().plus.wrap(retryWrapper, {
       delay: 100
     });
-    request('http://example.com/test-path')
+    request('http://example3.com/test-path')
       .then(() => {
         done.fail('unexpected success');
       })
@@ -115,5 +115,12 @@ describe('retryDecorator', () => {
       .catch(done.fail);
   });
 
+
+  it('accepts immutable retry config.', done => {
+    rp().plus.wrap(retryWrapper, Object.freeze({
+      attempts: 2
+    }));
+    done();
+  });
 });
 
