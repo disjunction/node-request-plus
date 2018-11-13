@@ -271,7 +271,7 @@ const request = rp({
   log: {
     events: {
       fail: 'error',
-      retryFail: (eventName, uri, attempt, error) => {
+      retryFail: (eventName, uri, error, attempt) => {
         console.error('failed despite retries: %j, on %d attempt', uri, attempt);
       }
     }
