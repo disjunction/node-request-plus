@@ -4,7 +4,7 @@
 * @param {Function} requester
 * @param {Object} [opts]
 * @param {number} [opts.attempts] - max attempts to make before giving up
-* @param {function(error: Error) : boolean} [opts.errorFiler] - returns true if we should retry
+* @param {function(error: Error) : boolean} [opts.errorFilter] - returns true if we should retry
 * @param {number|function(attempt) : number} [opts.delay = 500] - delay between retries (ms)
 * @return {function(uri, requestOptions, callback): Promise}
 */
