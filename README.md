@@ -173,7 +173,7 @@ see source code to see additional params provided for each event
 Params (all optional):
 * **attempts** = 3 - number of attempt before giving up
 * **delay** = 500(ms) - delay between retries. You can provide a closure and calculate it to make a progressive delay, e.g. `attempt => 500 * attempt * attempt`
-* **filterError** - closure defining whether a retry should be done. By default it returns `true` for a timeout and `statusCode` in `[500, 502, 503, 504]`
+* **errorFilter** - closure defining whether a retry should be done. By default it returns `true` for either a timeout or the `statusCode` is in `[500, 502, 503, 504]`
 
 ```javascript
 const rp = require('request-plus');
@@ -182,9 +182,9 @@ const request = rp({
     attempts: 5,
     delay: 1500,
 
-    // retry all errors
-    filterErrors: error =>
-      error.message === 'Error: ETIMEDOUT'
+    // retry all errors (timeout returns no response object)
+    errorFilter: error =>
+      error.response === undefined
       || error.statusCode >= 400
   }
 });
@@ -271,7 +271,7 @@ const request = rp({
   log: {
     events: {
       fail: 'error',
-      retryFail: (eventName, uri, attempt, error) => {
+      retryFail: (eventName, uri, error, attempt) => {
         console.error('failed despite retries: %j, on %d attempt', uri, attempt);
       }
     }
